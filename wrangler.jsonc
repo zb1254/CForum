@@ -15,9 +15,9 @@
 	},
 	"d1_databases": [
 		{
-			"binding": "cforum_db",
+			"binding": "DB",
 			"database_name": "cforum-db",
-			"database_id": "851270eb-80b8-4e31-825e-645d444898d6",
+			"database_id": "8c83a524-f021-4419-b6f5-702c1a821b88",
 			"remote": true,
 			"migrations_dir": "migrations"
 		}
@@ -29,7 +29,7 @@
 	"r2_buckets": [
 		{
 			"binding": "BUCKET",
-			"bucket_name": "cforum-images"
+			"bucket_name": "cforum-images","preview_bucket_name": "cforum-images"
 		}
 	],
 	/**
