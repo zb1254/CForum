@@ -15,7 +15,7 @@
 	},
 	"d1_databases": [
 		{
-			"binding": "DB",
+			"binding": "cforum_db",
 			"database_name": "cforum-db",
 			"database_id": "03a9abbd-11d1-458a-b3f1-4a2db549dc3f",
 			"remote": true,
