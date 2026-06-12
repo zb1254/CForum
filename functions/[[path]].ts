@@ -27,7 +27,7 @@ export const onRequest: PagesFunction = async (context) => {
 	try {
 		const isLocalDev = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
 		let workerUrl = (env.WORKER_URL as string) ||
-			(isLocalDev ? 'http://localhost:8787' : 'https://cforum.adysec.workers.dev');
+			(isLocalDev ? 'http://localhost:8787' : 'https://cforum.1319836731.workers.dev');
 
 		if (!workerUrl.startsWith('http')) {
 			console.warn(`⚠️ Invalid WORKER_URL: ${workerUrl}`);
