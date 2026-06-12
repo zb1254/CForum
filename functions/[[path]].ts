@@ -31,7 +31,7 @@ export const onRequest: PagesFunction = async (context) => {
 
 		if (!workerUrl.startsWith('http')) {
 			console.warn(`⚠️ Invalid WORKER_URL: ${workerUrl}`);
-			workerUrl = isLocalDev ? 'http://localhost:8787' : 'https://cforum.adysec.workers.dev';
+			workerUrl = isLocalDev ? 'http://localhost:8787' : 'https://cforum.1319836731.workers.dev';
 		}
 
 		console.log(`↔️ Proxying request to Worker: ${workerUrl}${pathname}`);
