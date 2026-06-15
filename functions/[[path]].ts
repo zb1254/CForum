@@ -11,6 +11,11 @@ export const onRequest: PagesFunction = async (context) => {
 	const isR2Route = pathname.startsWith('/r2/');
 
 	if (!isApiRoute && !isR2Route) {
+		// Serve post.html for post detail routes (e.g. /posts/3, /post/3)
+		const isPostRoute = /^\/posts\/\d+$/.test(pathname) || /^\/post\/\d+$/.test(pathname);
+		if (isPostRoute) {
+			return env.ASSETS.fetch(new URL('/post.html', request.url));
+		}
 		return context.next();
 	}
 
