@@ -86,6 +86,13 @@ function hasRestrictedKeywords(username: string): boolean {
 	const restricted = ['管理', 'admin', 'sudo', 'test'];
 	return restricted.some(keyword => username.toLowerCase().includes(keyword.toLowerCase()));
 }
+function hasProhibitedContent(text: string): string | null {
+	const list = ['习近平', '胡锦涛', '毛泽东', '江泽民', '操你妈', '共产党', '六四', '法轮功', '卖淫', '嫖娼', '吸毒', '毒品', '白粉', '海洛因', '赌博', '网贷', '翻墙'];
+	for (const word of list) {
+		if (text.includes(word)) return `内容包含违禁词: ${word}`;
+	}
+	return null;
+}
 
 async function verifyTurnstile(token: string, ip: string, secretKey: string): Promise<boolean> {
 	const formData = new FormData();
@@ -1689,6 +1696,8 @@ const user = await env.cforum_db.prepare('SELECT * FROM users WHERE email_change
 				if (title.length > 30) return jsonResponse({ error: 'Title too long (Max 30 chars)' }, 400);
 				if (content.length > 3000) return jsonResponse({ error: 'Content too long (Max 3000 chars)' }, 400);
 				if (hasControlCharacters(title) || hasControlCharacters(content)) return jsonResponse({ error: 'Title or content contains invalid control characters' }, 400);
+			const prohibitedErr = hasProhibitedContent(title) || hasProhibitedContent(content);
+			if (prohibitedErr) return jsonResponse({ error: prohibitedErr }, 400);
 
 				// Validate Category
 				if (category_id) {
@@ -1768,6 +1777,8 @@ const user = await env.cforum_db.prepare('SELECT * FROM users WHERE email_change
 				}
 
 				if (content.length > 3000) return jsonResponse({ error: 'Content too long (Max 3000 chars)' }, 400);
+				const prohibitedErr = hasProhibitedContent(content);
+				if (prohibitedErr) return jsonResponse({ error: prohibitedErr }, 400);
 
 				const { success } = await env.cforum_db.prepare(
 					'INSERT INTO comments (post_id, parent_id, author_id, content) VALUES (?, ?, ?, ?)'
@@ -1869,6 +1880,8 @@ const user = await env.cforum_db.prepare('SELECT * FROM users WHERE email_change
 				if (isVisuallyEmpty(title) || isVisuallyEmpty(content)) return jsonResponse({ error: 'Title or content cannot be empty' }, 400);
 				
 				if (hasInvisibleCharacters(title) || hasInvisibleCharacters(content)) return jsonResponse({ error: 'Title or content contains invalid invisible characters' }, 400);
+				const prohibitedErr = hasProhibitedContent(title) || hasProhibitedContent(content);
+                if (prohibitedErr) return jsonResponse({ error: prohibitedErr }, 400);
 
 				// Validate Lengths
 				if (title.length > 30) return jsonResponse({ error: 'Title too long (Max 30 chars)' }, 400);
