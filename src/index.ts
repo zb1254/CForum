@@ -1755,7 +1755,31 @@ const user = await env.cforum_db.prepare('SELECT * FROM users WHERE email_change
 				return handleError(e);
 			}
 		}
+			// POST /api/posts/:id/comments (Create comment)
+		if (url.pathname.match(/^\/api\/posts\/\d+\/comments$/) && method === 'POST') {
+			const postId = url.pathname.split('/')[3];
+			try {
+				const userPayload = await authenticate(request);
+				const body = await request.json() as any;
+				const { content, parent_id } = body;
 
+				if (!content) {
+					return jsonResponse({ error: 'Missing content' }, 400);
+				}
+
+				if (content.length > 3000) return jsonResponse({ error: 'Content too long (Max 3000 chars)' }, 400);
+
+				const { success } = await env.cforum_db.prepare(
+					'INSERT INTO comments (post_id, parent_id, author_id, content) VALUES (?, ?, ?, ?)'
+				).bind(postId, parent_id || null, userPayload.id, content.trim()).run();
+				
+				await security.logAudit(userPayload.id, 'CREATE_COMMENT', 'comment', String(postId), { post_id: postId }, request);
+
+				return jsonResponse({ success }, 201);
+			} catch (e) {
+				return handleError(e);
+			}
+		}
 		// DELETE /api/comments/:id
 		if (url.pathname.match(/^\/api\/comments\/\d+$/) && method === 'DELETE') {
 			const id = url.pathname.split('/').pop();
