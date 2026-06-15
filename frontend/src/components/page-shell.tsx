@@ -35,6 +35,9 @@ export function PageShell({
 				</div>
 			)}
 			<main className="mx-auto w-full max-w-5xl px-4 py-6">{children}</main>
+		    <footer className="border-t py-4 text-center text-xs text-muted-foreground">
+				&copy; {new Date().getFullYear()} 共聚. All rights reserved.
+			</footer>
 		</div>
 	);
 }
