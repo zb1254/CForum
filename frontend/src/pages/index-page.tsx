@@ -283,6 +283,20 @@ export function IndexPage() {
 	const enabled = !!config?.turnstile_enabled;
 	const siteKey = config?.turnstile_site_key || '';
 	const turnstileActive = enabled && !!siteKey;
+	const [popupOpen, setPopupOpen] = React.useState(false);
+	const popupDismissed = React.useRef(false);
+
+	React.useEffect(() => {
+		if (config?.popup_notice_enabled && config?.popup_notice && !popupDismissed.current) {
+			const timer = setTimeout(() => setPopupOpen(true), 500);
+			return () => clearTimeout(timer);
+		}
+	}, [config?.popup_notice_enabled, config?.popup_notice]);
+
+	function dismissPopup() {
+		popupDismissed.current = true;
+		setPopupOpen(false);
+	}
 
 	const fetchCategories = React.useCallback(async () => {
 		try {
@@ -605,7 +619,12 @@ export function IndexPage() {
 						</Button>
 					</div>
 				</div>
-
+				{config?.homepage_notice ? (
+					<div
+						className="rounded-md border bg-muted/40 p-4 text-sm prose max-w-none break-words [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-1"
+						dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(config.homepage_notice) }}
+					/>
+				) : null}
 				{user ? (
 					<Card>
 						<CardHeader>
@@ -984,6 +1003,34 @@ export function IndexPage() {
 					</form>
 				</div>
 			</div>
+
+			{popupOpen && config?.popup_notice ? (
+				<div
+					className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+					onClick={dismissPopup}
+				>
+					<div
+						className="max-h-[80vh] max-w-lg overflow-auto rounded-lg border bg-background p-6 shadow-xl"
+						onClick={(e) => e.stopPropagation()}
+					>
+						<div className="mb-4 flex items-center justify-between">
+							<h2 className="text-lg font-semibold">公告</h2>
+							<button
+								type="button"
+								className="rounded p-1 hover:bg-muted"
+								onClick={dismissPopup}
+							>
+								<X className="h-5 w-5" />
+								<span className="sr-only">关闭</span>
+							</button>
+						</div>
+						<div
+							className="prose max-w-none break-words text-sm [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-1"
+							dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(config.popup_notice) }}
+						/>
+					</div>
+				</div>
+			) : null}
 		</PageShell>
 	);
 }
