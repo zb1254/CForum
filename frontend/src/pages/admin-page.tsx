@@ -29,6 +29,9 @@ export function AdminPage() {
 		notify_on_username_change: false,
 		notify_on_avatar_change: false,
 		notify_on_manual_verify: false
+		homepage_notice: '',
+		popup_notice: '',
+		popup_notice_enabled: false
 	});
 
 	const [newCategoryName, setNewCategoryName] = React.useState('');
@@ -70,6 +73,9 @@ export function AdminPage() {
 				notify_on_username_change: !!settings.notify_on_username_change,
 				notify_on_avatar_change: !!settings.notify_on_avatar_change,
 				notify_on_manual_verify: !!settings.notify_on_manual_verify
+				homepage_notice: settings.homepage_notice || '',
+				popup_notice: settings.popup_notice || '',
+				popup_notice_enabled: !!settings.popup_notice_enabled
 			});
 		} catch (e: any) {
 			setError(String(e?.message || e));
@@ -325,7 +331,38 @@ export function AdminPage() {
 										手动验证通过时通知用户
 									</label>
 								</div>
-								<Button onClick={saveSettings} disabled={loading}>
+																<Separator />
+								<div className="space-y-3">
+									<div className="space-y-2">
+										<Label>主页公告块</Label>
+										<textarea
+											className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+											rows={3}
+											value={systemSettings.homepage_notice}
+											onChange={(e) => setSystemSettings((s) => ({ ...s, homepage_notice: e.target.value }))}
+											placeholder="显示在发布新帖上方，支持 Markdown 格式"
+										/>
+									</div>
+									<div className="space-y-2">
+										<Label>弹窗公告</Label>
+										<textarea
+											className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+											rows={3}
+											value={systemSettings.popup_notice}
+											onChange={(e) => setSystemSettings((s) => ({ ...s, popup_notice: e.target.value }))}
+											placeholder="用户进入首页时弹窗显示，支持 Markdown 格式"
+										/>
+									</div>
+									<label className="flex items-center gap-2 text-sm">
+										<input
+											type="checkbox"
+											className="h-4 w-4"
+											checked={systemSettings.popup_notice_enabled}
+											onChange={(e) => setSystemSettings((s) => ({ ...s, popup_notice_enabled: e.target.checked }))}
+										/>
+										启用弹窗公告
+									</label>
+								</div><Button onClick={saveSettings} disabled={loading}>
 									{loading ? '保存中...' : '保存设置'}
 								</Button>
 							</CardContent>
