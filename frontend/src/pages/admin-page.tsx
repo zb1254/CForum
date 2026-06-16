@@ -28,7 +28,7 @@ export function AdminPage() {
 		notify_on_user_delete: false,
 		notify_on_username_change: false,
 		notify_on_avatar_change: false,
-		notify_on_manual_verify: false
+		notify_on_manual_verify: false,
 		homepage_notice: '',
 		popup_notice: '',
 		popup_notice_enabled: false
@@ -72,7 +72,7 @@ export function AdminPage() {
 				notify_on_user_delete: !!settings.notify_on_user_delete,
 				notify_on_username_change: !!settings.notify_on_username_change,
 				notify_on_avatar_change: !!settings.notify_on_avatar_change,
-				notify_on_manual_verify: !!settings.notify_on_manual_verify
+				notify_on_manual_verify: !!settings.notify_on_manual_verify,
 				homepage_notice: settings.homepage_notice || '',
 				popup_notice: settings.popup_notice || '',
 				popup_notice_enabled: !!settings.popup_notice_enabled
@@ -331,7 +331,7 @@ export function AdminPage() {
 										手动验证通过时通知用户
 									</label>
 								</div>
-																<Separator />
+								<Separator />
 								<div className="space-y-3">
 									<div className="space-y-2">
 										<Label>主页公告块</Label>
@@ -362,7 +362,8 @@ export function AdminPage() {
 										/>
 										启用弹窗公告
 									</label>
-								</div><Button onClick={saveSettings} disabled={loading}>
+								</div>
+								<Button onClick={saveSettings} disabled={loading}>
 									{loading ? '保存中...' : '保存设置'}
 								</Button>
 							</CardContent>
