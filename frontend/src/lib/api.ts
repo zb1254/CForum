@@ -4,9 +4,11 @@ export type ForumConfig = {
 	turnstile_enabled: boolean;
 	turnstile_site_key: string;
 	user_count?: number;
-	jwt_secret_configured?: boolean; // indicates whether JWT_SECRET is set in backend
+	jwt_secret_configured?: boolean; 
+	homepage_notice?: string;
+	popup_notice?: string;
+	popup_notice_enabled?: boolean;
 };
-
 export type Category = {
 	id: number;
 	name: string;
