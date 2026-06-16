@@ -345,9 +345,12 @@ export default {
 		// GET /api/config
 		if (url.pathname === '/api/config' && method === 'GET') {
 			try {
-				const [setting, userCount] = await Promise.all([
+				const [setting, userCount, noticeSetting, popupNoticeSetting, popupEnabledSetting] = await Promise.all([
 					env.cforum_db.prepare("SELECT value FROM settings WHERE key = 'turnstile_enabled'").first<DBSetting>(),
-					env.cforum_db.prepare('SELECT COUNT(*) as count FROM users').first('count')
+					env.cforum_db.prepare('SELECT COUNT(*) as count FROM users').first('count'),
+					env.cforum_db.prepare("SELECT value FROM settings WHERE key = 'homepage_notice'").first<DBSetting>(),
+					env.cforum_db.prepare("SELECT value FROM settings WHERE key = 'popup_notice'").first<DBSetting>(),
+					env.cforum_db.prepare("SELECT value FROM settings WHERE key = 'popup_notice_enabled'").first<DBSetting>()
 				]);
 				
 				// 只有数据库设置为启用，且两个环境变量都配置时，才启用 Turnstile
@@ -360,7 +363,10 @@ export default {
 					turnstile_enabled: turnstileFullyConfigured,
 					turnstile_site_key: siteKey,
 					user_count: userCount || 0,
-					jwt_secret_configured: !!env.JWT_SECRET && String(env.JWT_SECRET).length >= 32
+					jwt_secret_configured: !!env.JWT_SECRET && String(env.JWT_SECRET).length >= 32,
+					homepage_notice: noticeSetting ? noticeSetting.value : '',
+					popup_notice: popupNoticeSetting ? popupNoticeSetting.value : '',
+					popup_notice_enabled: popupEnabledSetting ? popupEnabledSetting.value === '1' : false
 				});
 			} catch (e) {
 				return handleError(e);
@@ -379,12 +385,19 @@ export default {
 					notify_on_user_delete: false,
 					notify_on_username_change: false,
 					notify_on_avatar_change: false,
-					notify_on_manual_verify: false
+					notify_on_manual_verify: false,
+					homepage_notice: '',
+					popup_notice: '',
+					popup_notice_enabled: false
 				};
 				
 				if (settings.results) {
 					for (const row of settings.results) {
-						config[row.key as string] = row.value === '1';
+						if (row.key === 'homepage_notice' || row.key === 'popup_notice') {
+							config[row.key as string] = row.value;
+						} else {
+							config[row.key as string] = row.value === '1';
+						}
 					}
 				}
 				
@@ -401,7 +414,7 @@ export default {
 				if (userPayload.role !== 'admin') return jsonResponse({ error: 'Unauthorized' }, 403);
 
 				const body = await request.json() as any;
-				const { turnstile_enabled, notify_on_user_delete, notify_on_username_change, notify_on_avatar_change, notify_on_manual_verify } = body;
+				const { turnstile_enabled, notify_on_user_delete, notify_on_username_change, notify_on_avatar_change, notify_on_manual_verify, homepage_notice, popup_notice, popup_notice_enabled } = body;
 				
 				const stmt = env.cforum_db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
 				const batch = [];
@@ -411,6 +424,9 @@ export default {
 				if (notify_on_username_change !== undefined) batch.push(stmt.bind('notify_on_username_change', notify_on_username_change ? '1' : '0'));
 				if (notify_on_avatar_change !== undefined) batch.push(stmt.bind('notify_on_avatar_change', notify_on_avatar_change ? '1' : '0'));
 				if (notify_on_manual_verify !== undefined) batch.push(stmt.bind('notify_on_manual_verify', notify_on_manual_verify ? '1' : '0'));
+				if (homepage_notice !== undefined) batch.push(stmt.bind('homepage_notice', homepage_notice));
+				if (popup_notice !== undefined) batch.push(stmt.bind('popup_notice', popup_notice));
+				if (popup_notice_enabled !== undefined) batch.push(stmt.bind('popup_notice_enabled', popup_notice_enabled ? '1' : '0'));
 				
 				if (batch.length > 0) await env.cforum_db.batch(batch);
 
