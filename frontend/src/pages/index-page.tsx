@@ -619,12 +619,14 @@ export function IndexPage() {
 						</Button>
 					</div>
 				</div>
-				{config?.homepage_notice ? (
+			{config?.homepage_notice ? (
+				<div className="rounded-md border bg-card p-4 text-sm">
 					<div
-						className="rounded-md border bg-muted/40 p-4 text-sm prose max-w-none break-words [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-1"
+						className="prose max-w-none break-words text-sm [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-1"
 						dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(config.homepage_notice) }}
 					/>
-				) : null}
+				</div>
+			) : null}
 				{user ? (
 					<Card>
 						<CardHeader>
@@ -1004,33 +1006,34 @@ export function IndexPage() {
 				</div>
 			</div>
 
-			{popupOpen && config?.popup_notice ? (
+		{popupOpen && config?.popup_notice ? (
+			<div
+				className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+				onClick={dismissPopup}
+			>
 				<div
-					className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-					onClick={dismissPopup}
+					className="max-h-[85vh] w-full max-w-lg animate-in fade-in zoom-in-95 overflow-auto rounded-xl border bg-background shadow-2xl duration-200"
+					onClick={(e) => e.stopPropagation()}
 				>
-					<div
-						className="max-h-[80vh] max-w-lg overflow-auto rounded-lg border bg-background p-6 shadow-xl"
-						onClick={(e) => e.stopPropagation()}
-					>
-						<div className="mb-4 flex items-center justify-between">
-							<h2 className="text-lg font-semibold">公告</h2>
-							<button
-								type="button"
-								className="rounded p-1 hover:bg-muted"
-								onClick={dismissPopup}
-							>
-								<X className="h-5 w-5" />
-								<span className="sr-only">关闭</span>
-							</button>
-						</div>
+					<div className="sticky top-0 z-10 flex items-center justify-between rounded-t-xl border-b bg-muted/30 px-6 py-4 backdrop-blur">
+						<h2 className="text-lg font-semibold tracking-tight">📢 公告</h2>
+						<button
+							type="button"
+							className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+							onClick={dismissPopup}
+						>
+							<X className="h-5 w-5" />
+						</button>
+					</div>
+					<div className="px-6 py-5">
 						<div
 							className="prose max-w-none break-words text-sm [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-1"
 							dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(config.popup_notice) }}
 						/>
 					</div>
 				</div>
-			) : null}
+			</div>
+		) : null}
 		</PageShell>
 	);
 }
